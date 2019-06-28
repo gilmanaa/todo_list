@@ -3,6 +3,7 @@ class Task extends React.Component {
         super(props);
         this.deleteTask = this.deleteTask.bind(this);
         this.moveTask = this.moveTask.bind(this);
+        this.starTask = this.starTask.bind(this);
     }
     deleteTask() {
         this.props.delete(this.props.arrPosition, this.props.design);
@@ -10,11 +11,19 @@ class Task extends React.Component {
     moveTask() {
         this.props.move(this.props.arrPosition, this.props.design);
     }
+    starTask(event) {
+        event.target.classList[0] === "grey-star" ? event.target.classList = "gold-star" : event.target.classList = "grey-star";
+        this.props.star(this.props.arrPosition);
+    }
     render() {
+        var moveText = this.props.design === "todo" ? "Done" : "Undo";
+        var star = this.props.design === "todo" ? <span className="grey-star" onClick={this.starTask}></span> : null;
         return (
             <div className={this.props.design}>
+                <label className="move-text">{moveText}</label>
                 <input type="checkbox" onClick={this.moveTask} />
-                {this.props.text}
+                {star}
+                <span>{this.props.text}</span>
                 <button className="delete" onClick={this.deleteTask}>Delete</button>
             </div>
         )
@@ -27,7 +36,8 @@ class ToDo extends React.Component {
             input: "",
             key: "",
             add: false,
-            completeTask: false
+            completeTask: false,
+            star: false
         }
         this.todo = [];
         this.done = [];
@@ -35,6 +45,18 @@ class ToDo extends React.Component {
         this.addTask = this.addTask.bind(this);
         this.deleteTask = this.deleteTask.bind(this);
         this.moveTask = this.moveTask.bind(this);
+        this.starMove = this.starMove.bind(this);
+    }
+    starMove(taskNumber) {
+        var taskPosition = this.todo.findIndex(i => i.key === taskNumber);
+        var moveTask = this.todo.splice(taskPosition, 1);
+        this.setState({
+            add: false,
+            completeTask: false,
+            star: true,
+            input: moveTask[0].props.text,
+            key: moveTask[0].props.arrPosition
+        })
     }
     moveTask(taskNumber, category) {
         if (category === "done") {
@@ -43,6 +65,7 @@ class ToDo extends React.Component {
             this.setState({
                 add: true,
                 completeTask: false,
+                star: false,
                 input: moveTask[0].props.text,
                 key: moveTask[0].key
             })
@@ -52,6 +75,7 @@ class ToDo extends React.Component {
             this.setState({
                 add: false,
                 completeTask: true,
+                star: false,
                 input: moveTask[0].props.text,
                 key: moveTask[0].props.arrPosition
             })
@@ -63,14 +87,16 @@ class ToDo extends React.Component {
             this.todo.splice(taskPosition, 1);
             this.setState({
                 add: false,
-                completeTask: false
+                completeTask: false,
+                star: false
             })
         } else {
             var taskPosition = this.done.findIndex(i => i.key === taskNumber);
             this.done.splice(taskPosition, 1);
             this.setState({
                 add: false,
-                completeTask: false
+                completeTask: false,
+                star: false
             })
         }
 
@@ -80,6 +106,7 @@ class ToDo extends React.Component {
         this.setState({
             add: true,
             completeTask: false,
+            star: false,
             input: this.input.value,
             key: `task ${this.adds}`
         });
@@ -87,12 +114,15 @@ class ToDo extends React.Component {
     }
     render() {
         if (this.state.add) {
-            this.todo.push(<Task design="todo" text={this.state.input} delete={this.deleteTask} move={this.moveTask} arrPosition={this.state.key} key={this.state.key} />)
+            this.todo.push(<Task design="todo" text={this.state.input} delete={this.deleteTask} move={this.moveTask} star={this.starMove} arrPosition={this.state.key} key={this.state.key} />)
         }
         if (this.state.completeTask) {
             this.done.push(<Task design="done" text={this.state.input} delete={this.deleteTask} move={this.moveTask} arrPosition={this.state.key} key={this.state.key} />)
         }
-        var todoHeader = this.todo.length > 0 ? "Tasks/Goals" : null;
+        if (this.state.star) {
+            this.todo.unshift(<Task design="todo" text={this.state.input} delete={this.deleteTask} move={this.moveTask} star={this.starMove} arrPosition={this.state.key} key={this.state.key} />)
+        }
+        var todoHeader = this.todo.length > 0 ? "Tasks/Goals" : "Add some To Do's or Goals";
         var doneHeader = this.done.length > 0 ? "Accomplishments" : null;
         return (
             <div>
@@ -129,7 +159,7 @@ class App extends React.Component {
     render() {
         return (
             <div className="app-wrapper">
-                <Header text="Comfort Zone" class="logo" />
+                <Header text="The Do Zone" class="logo" />
                 <ToDo />
             </div>
         )

@@ -65,6 +65,7 @@ body {
     margin: 1px;
     color: rgb(24, 69, 59);
     text-shadow: 1px 1px rgb(13, 177, 75);
+    animation: taskin 0.5s ease-in;
 }
 .done {
     font-family: 'Libre Baskerville', serif;
@@ -77,7 +78,21 @@ body {
     justify-content: flex-start;
     align-items: center;
     margin: 1px;
+    animation: taskin 0.5s ease-in;
+}
+.done span {
     text-decoration: line-through;
+}
+.fade-out {
+    animation: taskout 0.5s ease-out;
+}
+@keyframes taskin {
+    0% {opacity: 0;}
+    100% {opacity: 0.8;}
+}
+@keyframes taskout {
+    0% {opacity: 0.8;}
+    100% {opacity: 0;}
 }
 .delete {
     position: absolute;
@@ -86,4 +101,25 @@ body {
     color: rgb(24, 69, 59);
     text-shadow: none;
     border-radius: 5px 5px 5px 5px;
+}
+.move-text {
+    font-size: 10px;
+    color: black;
+    text-shadow: none;
+}
+.grey-star {
+    background-image: url(../images/grey_star.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    height: 15px;
+    width: 15px;
+    margin-right: 10px;
+}
+.gold-star {
+    background-image: url(../images/star.webp);
+    background-size: contain;
+    background-repeat: no-repeat;
+    height: 15px;
+    width: 15px;
+    margin-right: 10px;
 }
