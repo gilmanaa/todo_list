@@ -23,7 +23,7 @@ class Task extends React.Component {
                 <label className="move-text">{moveText}</label>
                 <input type="checkbox" onClick={this.moveTask} />
                 {star}
-                <span>{this.props.text}</span>
+                <span className="task-text">{this.props.text}</span>
                 <button className="delete" onClick={this.deleteTask}>Delete</button>
             </div>
         )

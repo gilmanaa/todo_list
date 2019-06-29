@@ -65,8 +65,11 @@ body {
     align-items: center;
     margin: 1px;
     color: rgb(24, 69, 59);
-    text-shadow: 1px 1px rgb(13, 177, 75);
+    text-shadow: 0.5px 0.5px rgb(13, 177, 75);
     animation: taskin 0.5s ease-in;
+}
+.task-text {
+    width: calc(100% - 120px);
 }
 .done {
     font-family: 'Libre Baskerville', serif;
