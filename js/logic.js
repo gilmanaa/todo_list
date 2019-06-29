@@ -40,7 +40,9 @@ class ToDo extends React.Component {
             star: false
         }
         this.todo = [];
+        this.todoStates = [];
         this.done = [];
+        this.doneStates = [];
         this.adds = 0;
         this.addTask = this.addTask.bind(this);
         this.deleteTask = this.deleteTask.bind(this);
@@ -48,6 +50,8 @@ class ToDo extends React.Component {
         this.starMove = this.starMove.bind(this);
     }
     starMove(taskNumber) {
+        var storagePos = this.todoStates.findIndex(i => i.key === taskNumber);
+        this.todoStates.splice(storagePos,1);
         var taskPosition = this.todo.findIndex(i => i.key === taskNumber);
         var moveTask = this.todo.splice(taskPosition, 1);
         this.setState({
@@ -60,6 +64,8 @@ class ToDo extends React.Component {
     }
     moveTask(taskNumber, category) {
         if (category === "done") {
+            var storagePos = this.doneStates.findIndex(i => i.key === taskNumber);
+            this.doneStates.splice(storagePos,1);
             var taskPosition = this.done.findIndex(i => i.key === taskNumber);
             var moveTask = this.done.splice(taskPosition, 1);
             this.setState({
@@ -70,6 +76,8 @@ class ToDo extends React.Component {
                 key: moveTask[0].key
             })
         } else {
+            var storagePos = this.todoStates.findIndex(i => i.key === taskNumber);
+            this.todoStates.splice(storagePos,1);
             var taskPosition = this.todo.findIndex(i => i.key === taskNumber);
             var moveTask = this.todo.splice(taskPosition, 1);
             this.setState({
@@ -83,6 +91,8 @@ class ToDo extends React.Component {
     }
     deleteTask(taskNumber, category) {
         if (category === "todo") {
+            var storagePos = this.todoStates.findIndex(i => i.key === taskNumber);
+            this.todoStates.splice(storagePos,1);
             var taskPosition = this.todo.findIndex(i => i.key === taskNumber);
             this.todo.splice(taskPosition, 1);
             this.setState({
@@ -91,6 +101,8 @@ class ToDo extends React.Component {
                 star: false
             })
         } else {
+            var storagePos = this.doneStates.findIndex(i => i.key === taskNumber);
+            this.doneStates.splice(storagePos,1);
             var taskPosition = this.done.findIndex(i => i.key === taskNumber);
             this.done.splice(taskPosition, 1);
             this.setState({
@@ -99,7 +111,6 @@ class ToDo extends React.Component {
                 star: false
             })
         }
-
     }
     addTask() {
         this.adds++;
@@ -112,15 +123,65 @@ class ToDo extends React.Component {
         });
         $(".add-task-input").val("");
     }
+    componentDidUpdate(prevProps,prevState) {
+        localStorage.setItem("todo",JSON.stringify(this.todoStates));
+        localStorage.setItem("done",JSON.stringify(this.doneStates));
+    }
+    componentWillMount() {
+        if (localStorage.length > 0) {
+            if (typeof JSON.parse(localStorage.todo) != "undefined") {
+                this.savedTodo = JSON.parse(localStorage.todo).length > 0 ? JSON.parse(localStorage.todo) : [];
+            } else {
+                this.savedTodo = [];
+            }
+            if (typeof JSON.parse(localStorage.done) != "undefined") {
+                this.savedDone = JSON.parse(localStorage.done).length > 0 ? JSON.parse(localStorage.done) : [];
+            } else {
+                this.savedDone = [];
+            }   
+        } else {
+            this.savedTodo = [];
+            this.savedDone = [];
+        }
+    }
+    componentDidMount() {
+        var maxTaskNumber = 0;
+        for (let i = 0; i < this.savedTodo.length; i++) {
+            let taskNum = parseInt(this.savedTodo[i].key.split(" ")[1]);
+            taskNum > maxTaskNumber ? maxTaskNumber = taskNum : maxTaskNumber;
+        }
+        for (let i = 0; i < this.savedDone.length; i++) {
+            let taskNum = parseInt(this.savedDone[i].key.split(" ")[1]);
+            taskNum > maxTaskNumber ? maxTaskNumber = taskNum : maxTaskNumber;
+        }
+        this.adds = maxTaskNumber;
+        this.todoStates = this.savedTodo;
+        this.doneStates = this.savedDone;
+        this.savedTodo = [];
+        this.savedDone = [];
+    }
     render() {
+        if (this.savedTodo.length > 0) {
+            for (let i = 0; i < this.savedTodo.length; i++) {
+                this.todo.push(<Task design="todo" text={this.savedTodo[i].input} delete={this.deleteTask} move={this.moveTask} star={this.starMove} arrPosition={this.savedTodo[i].key} key={this.savedTodo[i].key}/>)
+            }
+        }
+        if (this.savedDone.length > 0) {
+            for (let i = 0; i < this.savedDone.length; i++) {
+                this.done.push(<Task design="done" text={this.savedDone[i].input} delete={this.deleteTask} move={this.moveTask} star={this.starMove} arrPosition={this.savedDone[i].key} key={this.savedDone[i].key}/>)
+            }
+        }
         if (this.state.add) {
             this.todo.push(<Task design="todo" text={this.state.input} delete={this.deleteTask} move={this.moveTask} star={this.starMove} arrPosition={this.state.key} key={this.state.key} />)
+            this.todoStates.push(this.state);
         }
         if (this.state.completeTask) {
             this.done.push(<Task design="done" text={this.state.input} delete={this.deleteTask} move={this.moveTask} arrPosition={this.state.key} key={this.state.key} />)
+            this.doneStates.push(this.state);
         }
         if (this.state.star) {
             this.todo.unshift(<Task design="todo" text={this.state.input} delete={this.deleteTask} move={this.moveTask} star={this.starMove} arrPosition={this.state.key} key={this.state.key} />)
+            this.todoStates.unshift(this.state);
         }
         var todoHeader = this.todo.length > 0 ? "Tasks/Goals" : "Add some To Do's or Goals";
         var doneHeader = this.done.length > 0 ? "Accomplishments" : null;
@@ -159,7 +220,7 @@ class App extends React.Component {
     render() {
         return (
             <div className="app-wrapper">
-                <Header text="The Do Zone" class="logo" />
+                <Header text="Get It Done" class="logo" />
                 <ToDo />
             </div>
         )

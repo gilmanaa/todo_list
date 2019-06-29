@@ -11,7 +11,6 @@ body {
 .header {
     height: 5vh;
     background-color: rgb(24, 69, 59);
-    /* font-family: 'Noto Serif', serif; */
     font-family: 'Libre Baskerville', serif;
     color: white;
     font-size: 20px;
@@ -28,6 +27,8 @@ body {
     height: 30px;
     width: 30px;
     margin-left: 10px;
+    position: relative;
+    top: 3px;
 }
 .input-wrapper {
     display: flex;
