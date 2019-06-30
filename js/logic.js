@@ -121,7 +121,7 @@ class ToDo extends React.Component {
             input: this.input.value,
             key: `task ${this.adds}`
         });
-        $(".add-task-input").val("");
+        this.input.value = "";
     }
     componentDidUpdate(prevProps,prevState) {
         localStorage.setItem("todo",JSON.stringify(this.todoStates));
@@ -160,7 +160,7 @@ class ToDo extends React.Component {
         this.savedTodo = [];
         this.savedDone = [];
     }
-    render() {
+    renderLogic() {
         if (this.savedTodo.length > 0) {
             for (let i = 0; i < this.savedTodo.length; i++) {
                 this.todo.push(<Task design="todo" text={this.savedTodo[i].input} delete={this.deleteTask} move={this.moveTask} star={this.starMove} arrPosition={this.savedTodo[i].key} key={this.savedTodo[i].key}/>)
@@ -183,6 +183,10 @@ class ToDo extends React.Component {
             this.todo.unshift(<Task design="todo" text={this.state.input} delete={this.deleteTask} move={this.moveTask} star={this.starMove} arrPosition={this.state.key} key={this.state.key} />)
             this.todoStates.unshift(this.state);
         }
+        
+    }
+    render() {
+        this.renderLogic();
         var todoHeader = this.todo.length > 0 ? "Tasks/Goals" : "Add some To Do's or Goals";
         var doneHeader = this.done.length > 0 ? "Accomplishments" : null;
         return (
